@@ -1,0 +1,87 @@
+total = 0
+temp = False
+
+b_2(n) = (n+1)/2
+c_2(n) = n/2
+
+#input here to calculate b_N, c_N
+N = 3
+
+bvals = []
+cvals = []
+bnewvals = []
+cnewvals = []
+
+#inputs enough values of b_2 to calculate the b_N we want
+for i in range(1, 50):
+    bvals.append(b_2(i))
+
+#inputs enough values of c_2 to calculate the c_N we want
+for i in range(1, 50):
+    cvals.append(c_2(i))
+
+#loops through each time we calculate the next b_i and c_i
+for K in range(1, (N-1)):
+    
+    #calculates values of b_{i+2} 
+    for i in range(1, 50):
+        #adds a zero into the list if it is an even index
+        if temp == True:
+            bnewvals.append(0)
+            temp = False
+        #calculates the sum and adds it to the list of values when index is odd
+        else:
+            for j in range(1, ((i+1)/2)+1):
+                total += bvals[2*j-2]
+            for j in range(1, ((i-1)/2)+1):
+                total += cvals[2*j-1]
+            bnewvals.append(total)
+            total = 0
+            temp = True
+            
+    temp = True
+    
+    #calculates values of c_{i+2} 
+    for i in range(1, 50):
+        #adds a zero into the list if it is an odd index
+        if temp == True:
+            cnewvals.append(0)
+            temp = False
+        #calculates the sum and adds it to the list of values when index is even
+        else:
+            for j in range(1,(i/2)+1):
+                total += bvals[2*j-2]
+                total += cvals[2*j-1]
+            cnewvals.append(total)
+            total = 0
+            temp = True
+    #sets the calculated values into the known set so that the process can be repeated to calculate the next set of values
+    bvals = bnewvals
+    cvals = cnewvals
+    bnewvals = []
+    cnewvals = []
+
+R = PolynomialRing(RR, 'n')
+
+#creates lists of values to use Lagrange interpolation on
+blist = []
+for i in range(1, N+1):
+    blist.append(((2*i - 1), bvals[2*i - 2]))
+
+clist = []
+for i in range(1, N+1):
+    clist.append((2*i, cvals[2*i - 1]))
+
+#performs Lagrange interpolation, factors the answer and prints it
+b = R.lagrange_polynomial(blist)
+print("b_N(n) is:")
+print(b.factor())
+print("Which was calculated from the follwoing set of pairs:")
+print(blist)
+
+
+c = R.lagrange_polynomial(clist)
+print("c_N(n) is:")
+print(c.factor())
+print("Which was calculated from the follwoing set of pairs:")
+print(clist)
